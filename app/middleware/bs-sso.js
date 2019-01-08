@@ -1,36 +1,17 @@
 'use strict';
-const sha1 = require('sha1');
-const md5 = require('md5');
-const querystring = require('querystring');
+
 const jwt = require('jsonwebtoken');
 const accountReg = new RegExp(/\/account\/user\/(\w+)/);
-
-const resolveFunctionPath = (paths = [], context) => {
-  if (paths.length === 0) return context;
-  context = context[paths.shift()];
-  return resolveFunctionPath(paths, context);
-};
-
-const guardSign = (ticket, { UC_SECRET, UC_SALT, UC_ID }) => {
-  const params = {
-    appId: UC_ID,
-    ticket,
-  };
-  const sha = sha1(querystring.stringify(params));
-  const sign = md5(sha + UC_SECRET + UC_SALT);
-  return sign.substr(5, 24);
-};
-
 const viewService = async (
   ctx,
   { tokenTime = 3, userFunction, constant: { UC_SECRET, UC_SALT, UC_SERVICE, UC_ID } }
 ) => {
   const ticket = ctx.queries.ticket && ctx.queries.ticket[0];
-
+  const { guardSign } = ctx.helper;
   const params = {
     appId: UC_ID,
     ticket,
-    sign: guardSign(ticket, { UC_SECRET, UC_SALT, UC_ID }),
+    sign: guardSign({ ticket }, { UC_SECRET, UC_SALT, UC_ID }),
   };
 
   const url = UC_SERVICE + '/staff/account/user';
@@ -42,9 +23,7 @@ const viewService = async (
   });
   const { data: { data: user, code } } = result;
   if (code === 0) {
-    const paths = userFunction.split('.');
-    const _userFunction = resolveFunctionPath(paths, ctx).bind({ ctx });
-    const userResult = await _userFunction(user);
+    const userResult = await userFunction(ctx, user);
     if (userResult) {
       const { uid, name, cname } = user;
       const jwtToken = jwt.sign({ uid, name, cname }, 'secret', { expiresIn: `${tokenTime}h` });

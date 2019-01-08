@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 module.exports = () => {
   return async function(ctx, next) {
     const urlPrefix = ctx.app.config.bsSso.urlPrefix;
-    if (ctx.url.search(urlPrefix) !== -1) {
+    if (urlPrefix && ctx.url.search(urlPrefix) !== -1) {
       const jwtToken = ctx.get('Authorization').replace('Bearer ', '');
       if (!jwtToken) {
         ctx.status = 401;
