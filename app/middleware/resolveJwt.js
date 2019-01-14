@@ -7,6 +7,9 @@ module.exports = () => {
       const jwtToken = ctx.get('Authorization').replace('Bearer ', '');
       if (!jwtToken) {
         ctx.status = 401;
+        ctx.body = {
+          code: 1001,
+        };
       } else {
         try {
           const decoded = jwt.verify(jwtToken, 'secret');
@@ -21,6 +24,7 @@ module.exports = () => {
           }
         } catch (error) {
           ctx.status = 401;
+          ctx.body = { code: 1001 };
         }
       }
     } else {

@@ -1,7 +1,7 @@
 'use strict';
 
 const Service = require('egg').Service;
-
+// 同步sso员工列表
 class SsoService extends Service {
   async queryStaff() {
     const { guardSign } = this.ctx.helper;
