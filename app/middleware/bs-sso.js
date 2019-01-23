@@ -28,12 +28,12 @@ const viewService = async (
       const { uid, name, cname } = user;
       const jwtToken = jwt.sign({ uid, name, cname }, 'secret', { expiresIn: `${tokenTime}h` });
       userResult.jwtToken = jwtToken;
-      ctx.body = userResult;
+      ctx.body = { data: userResult, code: 0, msg: '成功啦！' };
     } else {
       ctx.status = 400;
     }
   } else {
-    ctx.status = 400;
+    ctx.body = { code: -1 };
   }
 };
 
@@ -51,33 +51,35 @@ const logoutService = async (ctx, { constant: { UC_SERVICE, UC_ID } }) => {
 
 // validate token校验
 const validate = async (ctx, { urlPrefix }, next) => {
-  if (urlPrefix && ctx.url.search(urlPrefix) !== -1) {
-    const jwtToken = ctx.get('Authorization').replace('Bearer ', '');
-    if (!jwtToken) {
-      ctx.status = 401;
-      ctx.body = {
-        code: 1001,
-      };
-    } else {
-      try {
-        const decoded = jwt.verify(jwtToken, 'secret');
-        const exp = decoded.exp;
-        const now = new Date().getTime() / 1000;
-        if (now > exp) {
-          // toke过期
-          ctx.status = 401;
-          ctx.body = { code: 1001 };
-        } else {
-          await next();
-        }
-      } catch (error) {
-        ctx.status = 401;
-        ctx.body = { code: 1001 };
-      }
-    }
-  } else {
-    await next();
-  }
+  ctx.body = { data: {}, code: 0, msg: '成功啦！' };
+
+  // if (urlPrefix && ctx.url.search(urlPrefix) !== -1) {
+  //   const jwtToken = ctx.get('Authorization').replace('Bearer ', '');
+  //   if (!jwtToken) {
+  //     ctx.status = 401;
+  //     ctx.body = {
+  //       code: 1001,
+  //     };
+  //   } else {
+  //     try {
+  //       const decoded = jwt.verify(jwtToken, 'secret');
+  //       const exp = decoded.exp;
+  //       const now = new Date().getTime() / 1000;
+  //       if (now > exp) {
+  //         // toke过期
+  //         ctx.status = 401;
+  //         ctx.body = { code: 1001 };
+  //       } else {
+  //         await next();
+  //       }
+  //     } catch (error) {
+  //       ctx.status = 401;
+  //       ctx.body = { code: 1001 };
+  //     }
+  //   }
+  // } else {
+  //   await next();
+  // }
 };
 
 const accountRouter = {
