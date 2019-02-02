@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
 module.exports = app => {
-  app.config.coreMiddleware.push('bsSso');
-  app.config.coreMiddleware.push('resolveJwt');
-};
+	app.config.coreMiddleware.push('bsSso')
+	app.config.coreMiddleware.push('resolveJwt')
+}

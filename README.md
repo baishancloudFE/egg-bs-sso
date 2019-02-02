@@ -1,28 +1,6 @@
 # egg-bs-sso
 
-[![NPM version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
-[![Test coverage][codecov-image]][codecov-url]
-[![David deps][david-image]][david-url]
-[![Known Vulnerabilities][snyk-image]][snyk-url]
-[![npm download][download-image]][download-url]
-
-[npm-image]: https://img.shields.io/npm/v/egg-bs-sso.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/egg-bs-sso
-[travis-image]: https://img.shields.io/travis/eggjs/egg-bs-sso.svg?style=flat-square
-[travis-url]: https://travis-ci.org/eggjs/egg-bs-sso
-[codecov-image]: https://img.shields.io/codecov/c/github/eggjs/egg-bs-sso.svg?style=flat-square
-[codecov-url]: https://codecov.io/github/eggjs/egg-bs-sso?branch=master
-[david-image]: https://img.shields.io/david/eggjs/egg-bs-sso.svg?style=flat-square
-[david-url]: https://david-dm.org/eggjs/egg-bs-sso
-[snyk-image]: https://snyk.io/test/npm/egg-bs-sso/badge.svg?style=flat-square
-[snyk-url]: https://snyk.io/test/npm/egg-bs-sso
-[download-image]: https://img.shields.io/npm/dm/egg-bs-sso.svg?style=flat-square
-[download-url]: https://npmjs.org/package/egg-bs-sso
-
-<!--
-Description here.
--->
+白山node应用的sso插件。
 
 ## Install
 
@@ -35,17 +13,9 @@ $ npm i egg-bs-sso --save
 ```js
 // {app_root}/config/plugin.js
 exports.bsSso = {
-  constant: {
-    UC_ID: 0,
-    UC_SERVICE: '',
-    UC_SECRET: '',
-    UC_SALT: '',
-  },
-  callbackUrl: 'http://localhost:8080',
-  userFunction: 'service.user.create',
-  tokenTime: 24,
-  urlPrefix: /\/api/,
-};
+	enable: true,
+	package: 'egg-bs-sso'
+}
 ```
 
 ## Configuration
@@ -53,7 +23,33 @@ exports.bsSso = {
 ```js
 // {app_root}/config/config.default.js
 exports.bsSso = {
-};
+	// sso信息配置
+	constant: {
+		UC_ID: 0,
+		UC_SERVICE: '',
+		UC_SECRET: '',
+		UC_SALT: ''
+	},
+	// 登录成功后返回用户信息的处理
+	userFunction: async (ctx, user) => {
+		const { User, Platform } = ctx.model
+		const userResult = await User.findOne({ uid: user.uid })
+		if (!userResult) {
+			const platforms = await Platform.find().select('_id').exec()
+			const _user = new User({
+				platforms: platforms,
+				...user
+			})
+			return await _user.save()
+		} else {
+			return userResult
+		}
+	},
+	// token有效小时
+	tokenTime: 24,
+	// 忽略的url前缀
+	ignoreUrlPrefix: /\/api/
+}
 ```
 
 see [config/config.default.js](config/config.default.js) for more detail.
