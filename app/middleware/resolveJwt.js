@@ -2,8 +2,8 @@
 const jwt = require('jsonwebtoken')
 module.exports = () => {
 	return async function(ctx, next) {
-		const urlPrefix = ctx.app.config.bsSso.ignoreUrlPrefix
-		if (urlPrefix && ctx.url.search(urlPrefix) !== -1) {
+		const ignoreUrlPrefix = ctx.app.config.bsSso.ignoreUrlPrefix
+		if (ignoreUrlPrefix && ctx.url.search(ignoreUrlPrefix) === -1) {
 			const jwtToken = ctx.get('Authorization').replace('Bearer ', '')
 			if (!jwtToken) {
 				ctx.status = 401

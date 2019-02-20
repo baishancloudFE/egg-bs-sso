@@ -13,7 +13,7 @@ class AppBootHook {
 		const { staff } = ctx.service
 		// 挂载到model
 		ctx.model.Staff = Staff
-		const staffs = Staff.find()
+		const staffs = await Staff.find()
 		if (staffs.length === 0) {
 			// 同步到数据库
 			await staff.syncSsoStaff()
