@@ -25,10 +25,11 @@ const viewService = async (
 	if (code === 0) {
 		const userResult = await userFunction(ctx, user)
 		if (userResult) {
-			const { uid, name, cname } = user
-			const jwtToken = jwt.sign({ uid, name, cname }, 'secret', { expiresIn: `${tokenTime}h` })
-			userResult.jwtToken = jwtToken
-			ctx.body = { data: userResult, code: 0, msg: '成功啦！' }
+			const { uid, name, cname, type } = userResult
+			const jwtToken = jwt.sign({ uid, name, cname, type }, 'secret', { expiresIn: `${tokenTime}h` })
+			const _userResult = userResult.toObject()
+			_userResult.jwtToken = jwtToken
+			ctx.body = { data: _userResult, code: 0, msg: '成功啦！' }
 		} else {
 			ctx.status = 400
 		}
