@@ -40,7 +40,8 @@ const viewService = async (
 
 // login 跳转登录中心
 const loginService = async (ctx, { constant: { UC_SERVICE, UC_ID }, callbackUrl }) => {
-	const loginUrl = UC_SERVICE + '/staff-center?appId=' + UC_ID + '&callback=' + callbackUrl
+	const referer = ctx.headers.referer
+	const loginUrl = UC_SERVICE + '/staff-center?appId=' + UC_ID + '&callback=' + (callbackUrl ? callbackUrl : referer)
 	ctx.redirect(loginUrl)
 }
 
