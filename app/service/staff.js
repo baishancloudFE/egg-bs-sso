@@ -1,5 +1,4 @@
 'use strict'
-
 const Service = require('egg').Service
 // 同步sso员工列表
 class StaffService extends Service {

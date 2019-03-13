@@ -6,15 +6,15 @@ class AppBootHook {
 		app.config.coreMiddleware.push('resolveJwt')
 		this.app = app
 	}
-	async willReady() {
+	async serverDidReady() {
 		// 例如：加载model
 		const Staff = createStaffModel(this.app)
 		const ctx = this.app.createAnonymousContext()
 		const { staff } = ctx.service
 		// 挂载到model
 		ctx.model.Staff = Staff
-		const staffs = await Staff.find()
-		if (staffs.length === 0) {
+		const staffs = await Staff.countDocuments()
+		if (staffs === 0) {
 			// 同步到数据库
 			await staff.syncSsoStaff()
 		} else {
