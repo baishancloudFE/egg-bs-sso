@@ -6,8 +6,9 @@ class AppBootHook {
 		app.config.coreMiddleware.push('resolveJwt')
 		this.app = app
 	}
-	async serverDidReady() {
+	async willReady() {
 		// 例如：加载model
+		console.log('bs-sso')
 		const Staff = createStaffModel(this.app)
 		const ctx = this.app.createAnonymousContext()
 		const { staff } = ctx.service
